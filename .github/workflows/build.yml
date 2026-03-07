@@ -41,7 +41,7 @@ jobs:
         run: bun run build
 
       - name: Package with electron-builder
-        run: npx electron-builder ${{ matrix.dist-flag }}
+        run: npx electron-builder ${{ matrix.dist-flag }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
