@@ -1,0 +1,47 @@
+{
+  "name": "flashcard-app",
+  "version": "1.0.0",
+  "description": "Anki-like flashcard app with Ollama AI grading",
+  "main": "dist/main/index.js",
+  "private": true,
+  "scripts": {
+    "dev:renderer": "vite",
+    "dev:main": "bun build src/main/index.ts --outdir dist/main --target node --format cjs --external electron --external better-sqlite3 --external adm-zip && bun build src/preload/index.ts --outdir dist/preload --target node --format cjs --external electron",
+    "dev": "bun run dev:main && concurrently \"vite\" \"wait-on http://localhost:5173 && electron . --no-sandbox\"",
+    "build:main": "bun run dev:main",
+    "build:renderer": "vite build",
+    "build": "bun run build:main && bun run build:renderer",
+    "dist": "bun run build && electron-builder",
+    "dist:win": "bun run build && electron-builder --win",
+    "dist:linux": "bun run build && electron-builder --linux",
+    "postinstall": "npx electron-rebuild --module-dir ."
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/adm-zip": "^0.5.7",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "@types/uuid": "^11.0.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "concurrently": "^9.2.1",
+    "electron": "^40.8.0",
+    "electron-builder": "^26.8.1",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "wait-on": "^9.0.4"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "better-sqlite3": "^12.6.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "remark-gfm": "^4.0.1",
+    "uuid": "^13.0.0"
+  }
+}

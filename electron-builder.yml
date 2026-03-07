@@ -1,0 +1,39 @@
+appId: com.terence.revision-app
+productName: RevisionApp
+copyright: Copyright © 2026 Terence
+
+directories:
+  output: release
+
+files:
+  - dist/**/*
+  - resources/**/*
+  - "!node_modules/**/*"
+
+asar: true
+
+# Rebuild native modules (better-sqlite3) for Electron
+npmRebuild: true
+nodeGypRebuild: false
+buildDependenciesFromSource: false
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: null
+
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  deleteAppDataOnUninstall: false
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  category: Education
+  icon: null
