@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev:renderer": "vite",
-    "dev:main": "bun build src/main/index.ts --outdir dist/main --target node --format cjs --external electron --external better-sqlite3 --external adm-zip && bun build src/preload/index.ts --outdir dist/preload --target node --format cjs --external electron",
+    "dev:main": "bun build src/main/index.ts --outdir dist/main --target node --format cjs --external electron --external better-sqlite3 && bun build src/preload/index.ts --outdir dist/preload --target node --format cjs --external electron",
     "dev": "bun run dev:main && concurrently \"vite\" \"wait-on http://localhost:5173 && electron . --no-sandbox\"",
     "build:main": "bun run dev:main",
     "build:renderer": "vite build",

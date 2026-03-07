@@ -9,8 +9,13 @@ files:
   - dist/**/*
   - resources/**/*
   - "!node_modules/**/*"
+  - node_modules/better-sqlite3/**/*
+  - node_modules/bindings/**/*
+  - node_modules/file-uri-to-path/**/*
 
 asar: true
+asarUnpack:
+  - "**/*.node"
 
 # Rebuild native modules (better-sqlite3) for Electron
 npmRebuild: true
