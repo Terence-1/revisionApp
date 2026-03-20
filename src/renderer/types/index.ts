@@ -154,6 +154,20 @@ export interface CardMeta {
   lastReview: string | null;
 }
 
+// ── Search Types ──
+
+export interface SearchResult {
+  deckId: string;
+  deckName: string;
+  note: Note;
+}
+
+// ── AI Hint Types ──
+
+export interface HintResult {
+  hint: string;
+}
+
 // ── Power State ──
 
 export interface PowerState {
@@ -212,6 +226,12 @@ export interface FlashcardAPI {
   // Stats
   getDeckStats: (deckId: string) => Promise<DeckStats>;
   getStatsForPath: (pathPrefix: string) => Promise<DeckStats>;
+
+  // Search
+  searchAllDecks: (query: string, limit?: number) => Promise<SearchResult[]>;
+
+  // AI: Hint generation
+  generateHint: (front: string, back: string) => Promise<HintResult>;
 }
 
 declare global {

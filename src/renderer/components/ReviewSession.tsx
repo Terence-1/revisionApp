@@ -218,6 +218,11 @@ export default function ReviewSession({ pathPrefix, onFinish }: Props) {
   // End session (two-tap confirm)
   const [confirmQuit, setConfirmQuit] = useState(false);
 
+  // Hint state
+  const [hint, setHint] = useState<string | null>(null);
+  const [hintLoading, setHintLoading] = useState(false);
+  const [hintError, setHintError] = useState<string | null>(null);
+
   // Deep Review state
   const [deepReviewLoading, setDeepReviewLoading] = useState(false);
   const [deepReviewResult, setDeepReviewResult] = useState<DeepReviewResult | null>(null);
@@ -332,6 +337,9 @@ export default function ReviewSession({ pathPrefix, onFinish }: Props) {
     setUserAnswer("");
     setGradeResult(null);
     setShowBack(false);
+    setHint(null);
+    setHintLoading(false);
+    setHintError(null);
     setDeepReviewResult(null);
     setDeepReviewError(null);
     setDeepReviewOpen(false);
@@ -363,6 +371,22 @@ export default function ReviewSession({ pathPrefix, onFinish }: Props) {
       setDeepReviewError("Deep Review failed. Check your AI connection.");
     }
     setDeepReviewLoading(false);
+  };
+
+  const handleGetHint = async () => {
+    if (!current || hintLoading || hint) return;
+    setHintLoading(true);
+    setHintError(null);
+    try {
+      const result = await window.api.generateHint(
+        current.note.front,
+        current.note.back,
+      );
+      setHint(result.hint);
+    } catch {
+      setHintError("Failed to generate hint. Check your AI connection.");
+    }
+    setHintLoading(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -736,6 +760,35 @@ export default function ReviewSession({ pathPrefix, onFinish }: Props) {
           </div>
         </div>
 
+        {/* Hint display */}
+        {hint && !showBack && (
+          <div
+            className="mb-6 px-4 py-3 rounded-lg"
+            style={{
+              backgroundColor: "var(--accent-subtle)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <label
+              className="block text-xs uppercase tracking-wider mb-1.5 font-medium"
+              style={{ color: "var(--accent)" }}
+            >
+              Hint
+            </label>
+            <div className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              <MarkdownContent content={hint} />
+            </div>
+          </div>
+        )}
+        {hintError && !showBack && (
+          <div
+            className="mb-6 px-4 py-2 rounded-lg text-xs"
+            style={{ color: "var(--danger)" }}
+          >
+            {hintError}
+          </div>
+        )}
+
         {/* Answer comparison — shown after submit */}
         {showBack && (
           <div
@@ -955,6 +1008,40 @@ export default function ReviewSession({ pathPrefix, onFinish }: Props) {
               }}
             >
               Submit Answer
+            </button>
+            <button
+              onClick={handleGetHint}
+              disabled={hintLoading || !!hint}
+              className="px-5 py-2.5 rounded-lg text-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              style={{
+                backgroundColor: "var(--bg-card)",
+                color: hint ? "var(--accent)" : "var(--text-secondary)",
+                border: `1px solid ${hint ? "var(--accent)" : "var(--border)"}`,
+              }}
+            >
+              {hintLoading ? (
+                <>
+                  <div
+                    className="w-3.5 h-3.5 border-2 rounded-full animate-spin flex-shrink-0"
+                    style={{
+                      borderColor: "var(--border)",
+                      borderTopColor: "var(--accent)",
+                    }}
+                  />
+                  Thinking...
+                </>
+              ) : hint ? (
+                "Hint Given"
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  Get Hint
+                </>
+              )}
             </button>
             <button
               onClick={() => {

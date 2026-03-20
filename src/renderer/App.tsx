@@ -5,6 +5,7 @@ import DeckList from "./components/DeckList.js";
 import DeckView from "./components/DeckView.js";
 import ReviewSession from "./components/ReviewSession.js";
 import Settings from "./components/Settings.js";
+import GlobalSearch from "./components/GlobalSearch.js";
 
 type View =
   | { type: "home" }
@@ -19,9 +20,22 @@ export default function App() {
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
   const [apiReady, setApiReady] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const triggerRefresh = useCallback(() => {
     setRefreshKey((k) => k + 1);
+  }, []);
+
+  // Global keyboard shortcut: Ctrl+K / Cmd+K to open search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -94,6 +108,14 @@ export default function App() {
     }
   };
 
+  const handleSearchResult = (deckId: string, deckPath: string) => {
+    setView({ type: "deck", deckId, path: deckPath });
+  };
+
+  const handleOpenSearch = () => {
+    setSearchOpen(true);
+  };
+
   // Derive a key for view transitions
   const viewKey =
     view.type === "home"
@@ -132,6 +154,7 @@ export default function App() {
             isSettingsOpen={view.type === "settings"}
             refreshKey={refreshKey}
             ollamaStatus={ollamaStatus}
+            onOpenSearch={handleOpenSearch}
           />
           <div className="main-content" style={{ overflow: "auto" }}>
             <main key={viewKey} className="view-enter max-w-4xl mx-auto px-8 py-8 w-full">
@@ -186,6 +209,12 @@ export default function App() {
             </main>
           </div>
         </div>
+      )}
+      {searchOpen && (
+        <GlobalSearch
+          onSelectResult={handleSearchResult}
+          onClose={() => setSearchOpen(false)}
+        />
       )}
     </div>
   );

@@ -12,6 +12,7 @@ interface Props {
   isSettingsOpen: boolean;
   refreshKey: number;
   ollamaStatus: OllamaStatus | null;
+  onOpenSearch: () => void;
 }
 
 type DropPosition = "above" | "inside" | "below";
@@ -80,6 +81,7 @@ export default function Sidebar({
   isSettingsOpen,
   refreshKey,
   ollamaStatus,
+  onOpenSearch,
 }: Props) {
   const [tree, setTree] = useState<DeckTreeNode[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(() => {
@@ -635,6 +637,17 @@ export default function Sidebar({
               Cards
             </span>
             <div className="flex gap-1">
+              <button
+                onClick={onOpenSearch}
+                className="sidebar-action-btn"
+                style={{ color: "var(--text-muted)" }}
+                title="Search All Decks (Ctrl+K)"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </button>
               <button
                 onClick={() => setShowImport(true)}
                 className="sidebar-action-btn"

@@ -154,6 +154,41 @@ export function getDecksByPath(pathPrefix: string): Deck[] {
   );
 }
 
+// ── Search ──
+
+export interface SearchResult {
+  deckId: string;
+  deckName: string;
+  note: Note;
+}
+
+/**
+ * Search across all decks for notes matching a query string.
+ * Searches front, back, and tags (case-insensitive substring match).
+ */
+export function searchAllDecks(query: string, limit = 50): SearchResult[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+
+  const allDecks = getAllDecks();
+  const results: SearchResult[] = [];
+
+  for (const deck of allDecks) {
+    for (const note of deck.notes) {
+      if (results.length >= limit) return results;
+      if (
+        note.front.toLowerCase().includes(q) ||
+        note.back.toLowerCase().includes(q) ||
+        note.tags.some((t) => t.toLowerCase().includes(q))
+      ) {
+        results.push({ deckId: deck.id, deckName: deck.name, note });
+      }
+    }
+  }
+
+  return results;
+}
+
 // ── Note CRUD ──
 
 export function addNote(

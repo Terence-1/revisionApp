@@ -14,6 +14,7 @@ import {
   moveDeck,
   deleteByPath,
   getDecksByPath,
+  searchAllDecks,
 } from "./storage.js";
 import {
   checkOllamaStatus,
@@ -26,6 +27,7 @@ import {
   generateCards,
   deepReview,
   prioritizeCards,
+  generateHint,
 } from "./ai.js";
 import type { CardMeta } from "./ai.js";
 import {
@@ -328,4 +330,20 @@ export function registerIpcHandlers(): void {
       matureCards: allNotes.filter((n: Note) => n.review.interval >= 21).length,
     } satisfies DeckStats;
   });
+
+  // ── Search ──
+
+  ipcMain.handle("search-all-decks", (_e, query: string, limit?: number) =>
+    searchAllDecks(query, limit),
+  );
+
+  // ── AI: Hint generation ──
+
+  ipcMain.handle(
+    "generate-hint",
+    async (_e, front: string, back: string) => {
+      const models = getConfig().aiProvider === "ollama" ? await listAvailableModels() : [];
+      return generateHint(front, back, isOnBattery(), models);
+    },
+  );
 }

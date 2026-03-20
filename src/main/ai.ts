@@ -525,6 +525,60 @@ function fallbackGrade(
   return { score: 0, feedback: "No match found. (AI unavailable — using basic matching)" };
 }
 
+// ── Hint generation helper ────────────────────────────────────────────────────
+
+export interface HintResult {
+  hint: string;
+}
+
+/**
+ * Generate a helpful hint for a flashcard without revealing the full answer.
+ * The hint should nudge the student in the right direction.
+ */
+export async function generateHint(
+  front: string,
+  back: string,
+  onBattery: boolean,
+  availableModels: string[] = [],
+): Promise<HintResult> {
+  const messages: ChatMessage[] = [
+    {
+      role: "system",
+      content:
+        "You are a flashcard study assistant. You help students recall answers by giving short, helpful hints. You MUST respond with ONLY valid JSON — no prose, no markdown fences.",
+    },
+    {
+      role: "user",
+      content: `A student is trying to answer this flashcard but needs a hint.
+
+Question: ${front}
+Correct Answer: ${back}
+
+Give a brief hint that helps them recall the answer WITHOUT revealing it directly. The hint should:
+- Give a clue, mnemonic, first letter, category, or related concept
+- Be 1-2 sentences maximum
+- NOT contain the exact answer or most of the answer
+
+Respond with ONLY this JSON: {"hint": "<your hint>"}`,
+    },
+  ];
+
+  try {
+    const { text } = await chat(messages, "grading", onBattery, availableModels);
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) return { hint: `Think about the first letter: "${back.trim()[0]?.toUpperCase() ?? "?"}"...` };
+    const parsed = JSON.parse(match[0]) as { hint: string };
+    return { hint: parsed.hint || "No hint available." };
+  } catch {
+    // Fallback: simple first-letter hint
+    const firstChar = back.trim()[0]?.toUpperCase() ?? "?";
+    const wordCount = back.trim().split(/\s+/).length;
+    return {
+      hint: `The answer starts with "${firstChar}" and is ${wordCount} word${wordCount === 1 ? "" : "s"} long.`,
+    };
+  }
+}
+
 // ── Card prioritization ───────────────────────────────────────────────────────
 
 export interface CardMeta {

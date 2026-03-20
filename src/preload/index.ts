@@ -78,4 +78,12 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("get-deck-stats", deckId),
   getStatsForPath: (pathPrefix: string) =>
     ipcRenderer.invoke("get-stats-for-path", pathPrefix),
+
+  // Search
+  searchAllDecks: (query: string, limit?: number) =>
+    ipcRenderer.invoke("search-all-decks", query, limit),
+
+  // AI: Hint generation
+  generateHint: (front: string, back: string) =>
+    ipcRenderer.invoke("generate-hint", front, back),
 });
