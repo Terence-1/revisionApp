@@ -1,6 +1,6 @@
 {
   "name": "flashcard-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Anki-like flashcard app with Ollama AI grading",
   "main": "dist/main/index.js",
   "private": true,
